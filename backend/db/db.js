@@ -5,7 +5,7 @@ const connectToDb = () => {
     .connect(process.env.DbConnectUrl)
     .then(() => console.log("db connected !!"))
     .catch((e) => {
-      console.log(e);
+      console.log("error to connect db:",e);
     });
 };
 

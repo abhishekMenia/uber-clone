@@ -1,7 +1,13 @@
+import axios from "axios";
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 
 function UserSignup() {
+  const [show, setShow] = useState({
+    open: false,
+    error: false,
+    success: false,
+  });
   const [user, setUser] = useState({
     fullName: {
       firstName: "",
@@ -25,22 +31,72 @@ function UserSignup() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setUser({
-      fullName: {
-        firstName: "",
-        lastName: "",
-      },
-      email: "",
-      password: "",
-    });
-    console.log(user);
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/user/register`,
+        user
+      );
+      console.log(res);
+      if (res.status === 200) {
+        setShow({
+          open: true,
+          error: false,
+          success: true,
+        });
+        setUser({
+          fullName: {
+            firstName: "",
+            lastName: "",
+          },
+          email: "",
+          password: "",
+        });
+      } else {
+        setShow({
+          open: true,
+          error: true,
+          success: false,
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      setShow({
+        open: true,
+        error: true,
+        success: false,
+      });
+    }
   };
+
+  setTimeout(() => {
+    if (show.open === true) {
+      setShow({
+        open: false,
+        error: false,
+        success: false,
+      });
+    }
+  }, 2000);
 
   return (
     <div>
-      <div className="p-7 h-screen flex flex-col justify-between">
+      {show.open && (
+        <div className="pt-2 absolute w-full flex justify-center items-center">
+          {show.success && (
+            <div className="w-50 border rounded-2xl bg-green-300 p-4 text-center">
+              successfully
+            </div>
+          )}
+          {show.error && (
+            <div className="w-50 border rounded-2xl bg-red-300 p-4 text-center">
+              error
+            </div>
+          )}
+        </div>
+      )}
+      <div className="p-7 h-screen flex flex-col justify-between relative">
         <div>
           <img
             className="w-20 mb-5 rounded-md"

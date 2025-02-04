@@ -1,6 +1,12 @@
+import axios from "axios";
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 const CaptainSignup = () => {
+  const [show, setShow] = useState({
+    open: false,
+    error: false,
+    success: false,
+  });
   const [captain, setCaptain] = useState({
     fullName: {
       firstName: "",
@@ -37,26 +43,76 @@ const CaptainSignup = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setCaptain({
-      fullName: {
-        firstName: "",
-        lastName: "",
-      },
-      email: "",
-      password: "",
-      vehicle: {
-        vehicleType: "",
-        color: "",
-        plate: "",
-        capacity: "",
-      },
-    });
-    console.log(captain);
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/captain/register`,
+        captain
+      );
+      console.log(res);
+      if (res.status === 200) {
+        setShow({
+          open: true,
+          error: false,
+          success: true,
+        });
+        setCaptain({
+          fullName: {
+            firstName: "",
+            lastName: "",
+          },
+          email: "",
+          password: "",
+          vehicle: {
+            vehicleType: "",
+            color: "",
+            plate: "",
+            capacity: "",
+          },
+        });
+      } else {
+        setShow({
+          open: true,
+          error: true,
+          success: false,
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      setShow({
+        open: true,
+        error: true,
+        success: false,
+      });
+    }
   };
+
+  setTimeout(() => {
+    if (show.open === true) {
+      setShow({
+        open: false,
+        error: false,
+        success: false,
+      });
+    }
+  }, 2000);
   return (
     <div>
+      {show.open && (
+        <div className="pt-2 absolute w-full flex justify-center items-center">
+          {show.success && (
+            <div className="w-50 border rounded-2xl bg-green-300 p-4 text-center">
+              successfully
+            </div>
+          )}
+          {show.error && (
+            <div className="w-50 border rounded-2xl bg-red-300 p-4 text-center">
+              error
+            </div>
+          )}
+        </div>
+      )}
       <div className="p-7 pt-3 h-screen flex flex-col justify-between">
         <div>
           <img
@@ -129,6 +185,9 @@ const CaptainSignup = () => {
                 onChange={handleChange}
                 placeholder="vehicleType"
               >
+                <option className="text-xs" value="">
+                  default: vehicleType
+                </option>
                 <option className="text-xs" value="auto">
                   Auto
                 </option>
@@ -142,7 +201,7 @@ const CaptainSignup = () => {
 
               <input
                 className="rounded-md bg-gray-200 p-3  placeholder:text-base w-full  "
-                type="text"
+                type="number"
                 required
                 name="capacity"
                 value={captain.vehicle.capacity}

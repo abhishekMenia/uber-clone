@@ -1,7 +1,20 @@
-import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+import axios from "axios";
+import React, { useContext, useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { context } from "../context/UserContext";
 
 function UserLogin() {
+  //using context
+  const { setUserLogin, setUserToken } = useContext(context);
+
+  const navigate = useNavigate();
+
+  const [show, setShow] = useState({
+    open: false,
+    error: false,
+    success: false,
+  });
+
   const [user, setUser] = useState({
     email: "",
     password: "",
@@ -16,70 +29,126 @@ function UserLogin() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setUser({
-      email: "",
-      password: "",
-    });
-    console.log(user);
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/user/login`,
+        user
+      );
+      console.log(res);
+
+      if (res.status === 200) {
+        setShow({
+          open: true,
+          error: false,
+          success: true,
+        });
+        setUser({
+          email: "",
+          password: "",
+        });
+        setUserLogin(res.data.user);
+        setUserToken(res.data.token);
+        navigate("/home");
+      } else {
+        setShow({
+          open: true,
+          error: true,
+          success: false,
+        });
+      }
+    } catch (error) {
+      console.error(error.message);
+      setShow({
+        open: true,
+        error: true,
+        success: false,
+      });
+    }
   };
 
+  setTimeout(() => {
+    if (show.open === true) {
+      setShow({
+        open: false,
+        error: false,
+        success: false,
+      });
+    }
+  }, 2000);
+
   return (
-    <div className="p-7 h-screen flex flex-col justify-between">
-      <div>
-        <img
-          className="w-20 mb-5 rounded-md"
-          src="https://download.logo.wine/logo/Uber/Uber-Logo.wine.png"
-          alt="error loading"
-        />
-        <form onSubmit={handleSubmit}>
-          <h3 className="text-lg font-medium mb-2">What's your email</h3>
-          <input
-            className="rounded-md bg-gray-200 p-3  placeholder:text-base w-full mb-7 "
-            type="email"
-            required
-            name="email"
-            value={user.email}
-            onChange={handleChange}
-            placeholder="email@example.com"
-            autoComplete="off"
+    <>
+      {show.open && (
+        <div className="pt-2 absolute w-full flex justify-center items-center">
+          {show.success && (
+            <div className="w-50 border rounded-2xl bg-green-300 p-4 text-center">
+              successfully
+            </div>
+          )}
+          {show.error && (
+            <div className="w-50 border rounded-2xl bg-red-300 p-4 text-center">
+              error
+            </div>
+          )}
+        </div>
+      )}
+      <div className="p-7 h-screen flex flex-col justify-between">
+        <div>
+          <img
+            className="w-20 mb-5 rounded-md"
+            src="https://download.logo.wine/logo/Uber/Uber-Logo.wine.png"
+            alt="error loading"
           />
-          <h3 className="text-lg font-medium  mb-2">Password</h3>
-          <input
-            className="rounded-md bg-gray-200 p-3 placeholder:text-base w-full mb-7 "
-            type="password"
-            required
-            name="password"
-            value={user.password}
-            onChange={handleChange}
-            placeholder="Enter your password"
-          />
-          <div>
-            <button
-              type="submit"
-              className="border bg-black text-white font-semibold w-full py-2 rounded-md mb-3"
-            >
-              Login
-            </button>
-          </div>
-        </form>
-        <p className="text-center">
-          New Here ?{" "}
-          <NavLink className={"text-blue-500"} to={"/signup"}>
-            Create New Account
+          <form onSubmit={handleSubmit}>
+            <h3 className="text-lg font-medium mb-2">What's your email</h3>
+            <input
+              className="rounded-md bg-gray-200 p-3  placeholder:text-base w-full mb-7 "
+              type="email"
+              required
+              name="email"
+              value={user.email}
+              onChange={handleChange}
+              placeholder="email@example.com"
+              autoComplete="off"
+            />
+            <h3 className="text-lg font-medium  mb-2">Password</h3>
+            <input
+              className="rounded-md bg-gray-200 p-3 placeholder:text-base w-full mb-7 "
+              type="password"
+              required
+              name="password"
+              value={user.password}
+              onChange={handleChange}
+              placeholder="Enter your password"
+            />
+            <div>
+              <button
+                type="submit"
+                className="border bg-black text-white font-semibold w-full py-2 rounded-md mb-3"
+              >
+                Login
+              </button>
+            </div>
+          </form>
+          <p className="text-center">
+            New Here ?{" "}
+            <NavLink className={"text-blue-500"} to={"/signup"}>
+              Create New Account
+            </NavLink>
+          </p>
+        </div>
+        <div>
+          <NavLink
+            to={"/captainLogin"}
+            className="border flex justify-center bg-green-500 text-white font-semibold w-full py-2 rounded-md"
+          >
+            Sign in as Captain
           </NavLink>
-        </p>
+        </div>
       </div>
-      <div>
-        <NavLink
-          to={"/captainLogin"}
-          className="border flex justify-center bg-green-500 text-white font-semibold w-full py-2 rounded-md"
-        >
-          Sign in as Captain
-        </NavLink>
-      </div>
-    </div>
+    </>
   );
 }
 

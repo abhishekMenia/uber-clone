@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { NavLink } from "react-router-dom";
 import { context } from "../context/UserContext";
 
-function Home() {
+function Start() {
   const { user } = useContext(context);
 
   return (
@@ -31,4 +31,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default Start;

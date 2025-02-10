@@ -9,6 +9,8 @@ import UserHome from "./pages/UserHome";
 import UserPages from "./pages/UserPages";
 import CaptainPages from "./pages/CaptainPages";
 import CaptainHome from "./pages/CaptainHome";
+import "@fortawesome/fontawesome-free/css/all.min.css";
+
 function App() {
   return (
     <>

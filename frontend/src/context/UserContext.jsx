@@ -10,7 +10,7 @@ function UserContext({ children }) {
 
   useEffect(() => {
     if (userToken) {
-      localStorage.clear();
+      // localStorage.clear();
       localStorage.setItem("userToken", userToken);
       console.log(userToken);
     }

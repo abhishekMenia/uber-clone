@@ -8,7 +8,7 @@ function CaptianContext({ children }) {
 
   useEffect(() => {
     if (captainToken) {
-      localStorage.clear();
+      // localStorage.clear();
       localStorage.setItem("captainToken", captainToken);
     }
   }, [captainToken]);

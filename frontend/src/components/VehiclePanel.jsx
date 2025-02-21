@@ -1,6 +1,12 @@
 import React from "react";
 
-function VehiclePanel({ setVehiclePanelOpen, setConfirmPanelOpen }) {
+function VehiclePanel({
+  setVehiclePanelOpen,
+  setConfirmPanelOpen,
+  setPanelOpen,
+  distanceTime,
+  setVehicleSelected,
+}) {
   return (
     <>
       <div className="flex flex-col  bg-white p-2">
@@ -10,8 +16,9 @@ function VehiclePanel({ setVehiclePanelOpen, setConfirmPanelOpen }) {
             <i
               className="fa fa-angle-double-down"
               onClick={() => {
-                setConfirmPanelOpen(true);
+                // setConfirmPanelOpen(true);
                 setVehiclePanelOpen(false);
+                setPanelOpen(true);
               }}
               aria-hidden="true"
             ></i>
@@ -23,6 +30,7 @@ function VehiclePanel({ setVehiclePanelOpen, setConfirmPanelOpen }) {
           onClick={() => {
             setConfirmPanelOpen(true);
             setVehiclePanelOpen(false);
+            setVehicleSelected("car");
           }}
         >
           <img
@@ -39,7 +47,7 @@ function VehiclePanel({ setVehiclePanelOpen, setConfirmPanelOpen }) {
               <h4>3 min away.</h4>
               <h4 className="text-xs">Comfort, Cheaper</h4>
             </div>
-            <h4 className="font-semibold">$789.90</h4>
+            <h4 className="font-semibold">₹{distanceTime?.fare?.car}</h4>
           </div>
         </div>
         <div
@@ -47,6 +55,7 @@ function VehiclePanel({ setVehiclePanelOpen, setConfirmPanelOpen }) {
           onClick={() => {
             setConfirmPanelOpen(true);
             setVehiclePanelOpen(false);
+            setVehicleSelected("auto");
           }}
         >
           <img
@@ -63,7 +72,7 @@ function VehiclePanel({ setVehiclePanelOpen, setConfirmPanelOpen }) {
               <h4>2 min away.</h4>
               <h4 className="text-xs">Affordable, Cheaper</h4>
             </div>
-            <h4 className="font-semibold">$89.90</h4>
+            <h4 className="font-semibold">₹{distanceTime?.fare?.auto}</h4>
           </div>
         </div>
         <div
@@ -71,6 +80,7 @@ function VehiclePanel({ setVehiclePanelOpen, setConfirmPanelOpen }) {
           onClick={() => {
             setConfirmPanelOpen(true);
             setVehiclePanelOpen(false);
+            setVehicleSelected("moterCycle");
           }}
         >
           <img
@@ -87,7 +97,7 @@ function VehiclePanel({ setVehiclePanelOpen, setConfirmPanelOpen }) {
               <h4>2 min away.</h4>
               <h4 className="text-xs"> Cheaper</h4>
             </div>
-            <h4 className="font-semibold">$39.90</h4>
+            <h4 className="font-semibold">₹{distanceTime?.fare?.moterCycle}</h4>
           </div>
         </div>
       </div>

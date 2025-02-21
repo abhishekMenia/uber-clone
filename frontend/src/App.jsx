@@ -10,6 +10,8 @@ import UserPages from "./pages/UserPages";
 import CaptainPages from "./pages/CaptainPages";
 import CaptainHome from "./pages/CaptainHome";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import UserRide from "./components/UserRide";
+import CaptainRiding from "./components/CaptainRiding";
 
 function App() {
   return (
@@ -30,10 +32,26 @@ function App() {
             }
           />
           <Route
+            path="/ride"
+            element={
+              <UserPages>
+                <UserRide />
+              </UserPages>
+            }
+          />
+          <Route
             path="/captainHome"
             element={
               <CaptainPages>
                 <CaptainHome />
+              </CaptainPages>
+            }
+          />
+          <Route
+            path="/captainRiding"
+            element={
+              <CaptainPages>
+                <CaptainRiding />
               </CaptainPages>
             }
           />

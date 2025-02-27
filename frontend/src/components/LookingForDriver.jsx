@@ -64,7 +64,7 @@ function LookingForDriver({
           </div>
         </div>
         <div className="flex justify-start items-center mb-3">
-          <i class="fa fa-credit-card px-5" aria-hidden="true"></i>{" "}
+          <i className="fa fa-credit-card px-5" aria-hidden="true"></i>{" "}
           <div>
             <h4 className="text-2xl font-semibold">
               ₹{distanceTime?.fare[vehicleSelected]}

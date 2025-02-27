@@ -8,15 +8,20 @@ import ConfirmRide from "../components/ConfirmRide";
 import LookingForDriver from "../components/LookingForDriver";
 import WaitingForDriver from "../components/WaitingForDriver";
 import { axiosInstance } from "../../utility/axios";
+import { socketContextData } from "../context/SocketContext";
+import { useNavigate } from "react-router-dom";
+import LiveTracking from "../components/LiveTracking";
 
 function UserHome() {
   const { userLogin } = useContext(context);
+  const { sendMessage, receiveMessage, socket } = useContext(socketContextData);
   const [panelOpen, setPanelOpen] = useState(false);
   const [vehiclePanelOpen, setVehiclePanelOpen] = useState(false);
   const [confirmPanelOpen, setConfirmPanelOpen] = useState(false);
   const [vehicleFound, setVehicleFound] = useState(false);
   const [waitingDriver, setWaitingDriver] = useState(false);
   const [distanceTime, setDistanceTime] = useState();
+  const [rideAcceptedDetails, setRideAcceptedDetails] = useState({});
   const [rideData, setRideData] = useState();
   const [location, setLocation] = useState({
     data: [],
@@ -35,6 +40,35 @@ function UserHome() {
   const confirmPanelRef = useRef(null);
   const lookingForDriverRef = useRef(null);
   const waitingForDriverRef = useRef(null);
+
+  const navigate = useNavigate();
+
+  // console.log("user :", userLogin);
+
+  useEffect(() => {
+    sendMessage("join", { userType: "user", userId: userLogin._id });
+  }, []);
+  socket.on("rideConfirmed", (data) => {
+    console.log("ride accepted :", data);
+    setWaitingDriver(true);
+    setRideAcceptedDetails(data);
+  });
+  socket.on("rideOngoing", (data) => {
+    console.log("ride ongoing :", data);
+    setWaitingDriver(false);
+    navigate("/ride", { state: { rideAcceptedDetails: rideAcceptedDetails } });
+    // setRideAcceptedDetails(data);
+  });
+  socket.on("rideCompleted", (data) => {
+    console.log("ride completed :", data);
+    setWaitingDriver(false);
+    // setRideAcceptedDetails(data);
+  });
+  socket.on("rideCancelled", (data) => {
+    console.log("ride cancelled :", data);
+    setWaitingDriver(false);
+    // setRideAcceptedDetails(data);
+  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -103,6 +137,7 @@ function UserHome() {
     if (panelOpen) {
       gsap.to(panelRef.current, {
         height: "70%",
+        zIndex: 60,
       });
       gsap.to(arrowRef.current, {
         opacity: "1",
@@ -165,22 +200,23 @@ function UserHome() {
 
   return (
     <>
-      <div className="h-screen  relative overflow-hidden">
+      <div className="h-screen  relative overflow-hidden ">
         <img
           className="w-16 absolute ml-2 top-2"
           src="https://download.logo.wine/logo/Uber/Uber-Logo.wine.png"
           alt="err loading"
         />
-        <div className=" mb-3 h-screen w-screen ">
+        <div className=" h-[65%]  ">
           {/* <p>welcome {userLogin?.fullName?.firstName} !!</p> */}
-          <img
+          {/* <img
             className="h-full w-full object-cover"
             src="https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif"
             alt="err"
-          />
+          /> */}
+          <LiveTracking />
         </div>
         <div className="h-screen flex flex-col justify-end absolute top-0 w-full ">
-          <div className="p-5 h-[35%] bg-white relative ">
+          <div className="p-5 h-[35%] bg-white relative z-60 ">
             <div className="flex justify-between">
               <h4 className="font-semibold text-2xl ">Find Trip </h4>
               <i
@@ -223,7 +259,7 @@ function UserHome() {
               </button>
             </form>
           </div>
-          <div ref={panelRef} className="bg-white h-[0] overflow-y-auto  ">
+          <div ref={panelRef} className="bg-white h-[0]   overflow-y-auto  ">
             <LocationPanel
               setTrip={setTrip}
               location={location}
@@ -233,7 +269,7 @@ function UserHome() {
           </div>
         </div>
 
-        <div ref={vehiclePanelRef} className="bottom-0 fixed z-10 w-full ">
+        <div ref={vehiclePanelRef} className="bottom-0 fixed z-60 w-full ">
           <VehiclePanel
             setPanelOpen={setPanelOpen}
             distanceTime={distanceTime}
@@ -243,7 +279,7 @@ function UserHome() {
           ></VehiclePanel>
         </div>
 
-        <div ref={confirmPanelRef} className="bottom-0 fixed z-10 w-full ">
+        <div ref={confirmPanelRef} className="bottom-0 fixed z-60 w-full ">
           <ConfirmRide
             trip={trip}
             vehicleSelected={vehicleSelected}
@@ -255,7 +291,7 @@ function UserHome() {
           ></ConfirmRide>
         </div>
 
-        <div ref={lookingForDriverRef} className="bottom-0 fixed z-10 w-full ">
+        <div ref={lookingForDriverRef} className="bottom-0 fixed z-60 w-full ">
           <LookingForDriver
             rideData={rideData}
             vehicleSelected={vehicleSelected}
@@ -267,9 +303,11 @@ function UserHome() {
           ></LookingForDriver>
         </div>
 
-        <div ref={waitingForDriverRef} className="bottom-0 fixed z-10 w-full ">
+        <div ref={waitingForDriverRef} className="bottom-0 fixed z-60 w-full ">
           <WaitingForDriver
+            rideData={rideData}
             setWaitingDriver={setWaitingDriver}
+            rideAcceptedDetails={rideAcceptedDetails}
           ></WaitingForDriver>
         </div>
       </div>

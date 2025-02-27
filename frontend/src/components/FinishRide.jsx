@@ -1,7 +1,27 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { axiosInstance } from "../../utility/axios";
 
-const FinishRide = ({ setFinishRidePanel }) => {
+const FinishRide = ({ setFinishRidePanel, passenger }) => {
+  // console.log({ passenger });
+  const handelCompleteRide = async () => {
+    const payload = {
+      rideId: passenger._id,
+    };
+    try {
+      const res = await axiosInstance.patch("/ride/completed", payload, {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("captainToken"),
+        },
+      });
+      // console.log(res);
+      if (res.status === 200) {
+        navigate("/captainHome");
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
   const navigate = useNavigate();
   return (
     <div className="flex flex-col  bg-white p-2">
@@ -25,38 +45,40 @@ const FinishRide = ({ setFinishRidePanel }) => {
             alt="err"
           />
 
-          <h4 className="font-semibold">Esther Berry</h4>
+          <h4 className="font-semibold capitalize">
+            {passenger?.user?.fullName?.firstName +
+              " " +
+              passenger?.user?.fullName?.lastName}
+          </h4>
         </div>
-        <h4 className="font-semibold">2.2 KM</h4>
+        <h4 className="font-semibold">{passenger?.distance}</h4>
       </div>
       <div className="flex flex-col mt-2 px-4 ">
         <div className="flex justify-start items-center mb-3 border-b-2 border-gray-300">
           <i className="fa fa-map-marker px-5" aria-hidden="true"></i>
           <div>
-            <h4 className="text-2xl font-semibold">567/11-A</h4>
-            <h4 className="text-sm ">Kainkondrathali, Bengaluru, karnataka</h4>
+            <h4 className="text-2xl font-semibold">{passenger?.distance}</h4>
+            <h4 className="text-sm ">{passenger?.pickup}</h4>
           </div>
         </div>
         <div className="flex justify-start items-center mb-3 border-b-2 border-gray-300">
           <i className="fa fa-location-arrow px-5" aria-hidden="true"></i>
           <div>
-            <h4 className="text-2xl font-semibold">Aknoor Jammu</h4>
-            <h4 className="text-sm ">Kainkondrathali, Bengaluru, karnataka</h4>
+            <h4 className="text-2xl font-semibold">{passenger?.duration}</h4>
+            <h4 className="text-sm ">{passenger?.destination}</h4>
           </div>
         </div>
         <div className="flex justify-start items-center mb-3">
-          <i class="fa fa-credit-card px-5" aria-hidden="true"></i>{" "}
+          <i className="fa fa-credit-card px-5" aria-hidden="true"></i>{" "}
           <div>
-            <h4 className="text-2xl font-semibold">$789.90</h4>
+            <h4 className="text-2xl font-semibold">₹{passenger?.fare}</h4>
             <h4 className="text-sm ">Cash Cash</h4>
           </div>
         </div>
       </div>
       <button
         className="text-xl text-white bg-green-700 py-3 rounded-lg mt-10 mb-2"
-        onClick={() => {
-          navigate("/captainHome");
-        }}
+        onClick={handelCompleteRide}
       >
         Finish Ride
       </button>

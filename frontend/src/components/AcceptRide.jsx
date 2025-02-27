@@ -1,13 +1,51 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { axiosInstance } from "../../utility/axios";
 
-const AcceptRide = ({ setAcceptRidePanel, setRidePopUpPanel }) => {
+const AcceptRide = ({ setAcceptRidePanel, setRidePopUpPanel, passenger }) => {
   const navigate = useNavigate();
   const [otp, setOtp] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    navigate("/captainRiding");
+    const payload = {
+      rideId: passenger._id,
+      otp: otp,
+    };
+    try {
+      const res = await axiosInstance.post("/ride/checkOtp", payload, {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("captainToken"),
+        },
+      });
+      // console.log(res);
+      if (res.status === 200) {
+        navigate("/captainRiding", { state: { passenger: passenger } });
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const handelCancelRide = async () => {
+    const payload = {
+      rideId: passenger._id,
+    };
+    try {
+      const res = await axiosInstance.patch("/ride/captainCancelled", payload, {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("captainToken"),
+        },
+      });
+      // console.log(res);
+      if (res.status === 200) {
+        // navigate("/captainHome");
+        setRidePopUpPanel(false);
+        setAcceptRidePanel(false);
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
   };
 
   return (
@@ -32,7 +70,11 @@ const AcceptRide = ({ setAcceptRidePanel, setRidePopUpPanel }) => {
             alt="err"
           />
           <div className="flex flex-col">
-            <h4 className="font-semibold">Esther Berry</h4>
+            <h4 className="font-semibold capitalize">
+              {passenger?.user?.fullName?.firstName +
+                " " +
+                passenger?.user?.fullName?.lastName}
+            </h4>{" "}
             <div className="flex gap-2">
               <span className="text-xs rounded-md bg-gray-400 p-1">
                 ApplePay
@@ -44,24 +86,24 @@ const AcceptRide = ({ setAcceptRidePanel, setRidePopUpPanel }) => {
           </div>
         </div>
         <div className="flex flex-col">
-          <h4 className="font-semibold">₹25.00</h4>
-          <span className="text-xs text-gray-400">2.2 KM</span>
+          <h4 className="font-semibold">₹{passenger?.fare}</h4>
+          <span className="text-xs text-gray-400">{passenger?.distance}</span>
         </div>
       </div>
       <div className="flex flex-col gap-4 mt-5">
         <div className="flex flex-col border-b-2 p-2 border-gray-200 ">
           <p className="text-sm text-gray-400">PICK UP</p>
-          <h4>2334 Swift Village</h4>
+          <h4>{passenger?.pickup}</h4>
         </div>
         <div className="flex flex-col border-b-2 p-2 border-gray-200 ">
           <p className="text-sm text-gray-400">DROP OFF</p>
-          <h4>105 William St, Chicago, US</h4>
+          <h4>{passenger?.destination}</h4>
         </div>
       </div>
 
       <form onSubmit={handleSubmit}>
         <input
-          className="font-mono border-2 border-gray-200 w-full mt-5 px-4 py-2 rounded-2xl"
+          className="font-mono border-2 border-gray-200 w-full mt-5 px-4 py-2 rounded-2xl text-center"
           type="number"
           name="otp"
           placeholder="Enter OTP"
@@ -73,17 +115,14 @@ const AcceptRide = ({ setAcceptRidePanel, setRidePopUpPanel }) => {
             type="submit"
             className=" py-1.5 px-10 rounded-xl bg-green-700 text-white"
           >
-            Confirm
+            Confirm Ride
           </button>
           <button
             type="button"
             className=" py-1.5 px-10 rounded-xl bg-red-500 text-white"
-            onClick={() => {
-              setRidePopUpPanel(false);
-              setAcceptRidePanel(false);
-            }}
+            onClick={handelCancelRide}
           >
-            Cancel
+            Cancel Ride
           </button>
         </div>
       </form>

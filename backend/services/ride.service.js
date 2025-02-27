@@ -22,7 +22,8 @@ module.exports.createRide = async ({
   const fare = await getFare(pickup, destination);
   const otp = getOTP(6);
   console.log("bta do:", otp);
-  console.log("fare12345 :", fare.fare[vehicleType]);
+  // console.log("fare12345 :", fare.fare[vehicleType]);
+  console.log("fare12345 :", fare.distanceTime);
 
   const ride = await rideModel.create({
     user,
@@ -31,6 +32,8 @@ module.exports.createRide = async ({
     vehicleType,
     otp: otp,
     fare: fare?.fare[vehicleType],
+    distance: fare?.distanceTime?.distance?.text,
+    duration: fare?.distanceTime?.duration?.text,
   });
   console.log("ride :", ride);
 

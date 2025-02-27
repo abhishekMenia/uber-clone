@@ -5,6 +5,7 @@ export const captainDataContext = createContext();
 function CaptianContext({ children }) {
   const [captainLogin, setCaptainLogin] = useState({});
   const [captainToken, setCaptainToken] = useState();
+  // const [rideDetails, setRideDetails] = useState({});
 
   useEffect(() => {
     if (captainToken) {
@@ -18,7 +19,14 @@ function CaptianContext({ children }) {
 
   return (
     <captainDataContext.Provider
-      value={{ captainLogin, setCaptainLogin, captainToken, setCaptainToken }}
+      value={{
+        captainLogin,
+        setCaptainLogin,
+        captainToken,
+        setCaptainToken,
+        // setRideDetails,
+        // rideDetails,
+      }}
     >
       {children}
     </captainDataContext.Provider>

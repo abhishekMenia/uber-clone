@@ -1,4 +1,5 @@
 const axios = require("axios");
+const captainModel = require("../models/caption.model");
 
 module.exports.getAddressCoordinate = async (address) => {
   const key = process.env.MAP_KEY;
@@ -30,7 +31,7 @@ module.exports.getDistance = async (origin, destination) => {
     const response = await axios.get(
       `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origin}&destinations=${destination}&key=${key}`
     );
-    console.log("response:", response.data.rows[0].elements[0]);
+    // console.log("response:", response.data.rows[0].elements[0]);
     if (response.data.status === "OK") {
       if (response.data.rows[0].elements[0].status === "ZERO_RESULTS") {
         throw new Error("No routes found");
@@ -51,7 +52,7 @@ module.exports.getSuggestions = async (input) => {
     const response = await axios.get(
       `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${input}&key=${key}`
     );
-    console.log("response:", response.data.predictions);
+    // console.log("response:", response.data.predictions);
     if (response.data.status === "OK") {
       return response.data.predictions;
     } else {
@@ -61,4 +62,16 @@ module.exports.getSuggestions = async (input) => {
     console.log(error);
     throw error;
   }
+};
+
+module.exports.getCaptainsInTheRadius = async (ltd, lng, radius) => {
+  const captain = await captainModel.find({
+    location: {
+      $geoWithin: {
+        $centerSphere: [[ltd, lng], radius / 6371],
+      },
+    },
+  });
+
+  return captain;
 };

@@ -37,10 +37,10 @@ const rideSchema = new mongoose.Schema(
       type: String,
     },
     duration: {
-      type: Number,
+      type: String,
     },
     distance: {
-      type: Number,
+      type: String,
     },
     paymentID: {
       type: String,
